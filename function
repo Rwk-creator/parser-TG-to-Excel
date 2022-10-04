@@ -1,0 +1,18 @@
+async def endmonth():
+    wb = load_workbook('./basec.xlsx')
+    sheet = wb['Sheet1']
+    andrey = sheet["D104"].value
+    datenow = "2022-10-01 00:00:00.000000"
+    d = 0
+    if d != -1:
+        text = ""
+        while d < len(datenow):
+            text += datenow[d]
+            d += 1
+        datelist = re.findall('[0-9]+', text)
+    print(datelist)
+    if f'{datelist[0]}-{datelist[1]}-01 00:00:00.000000' == datenow:
+        await client.send_message('dm1tri4', f'Привет, за прошлый месяц ты заработал: {andrey} гривен')
+    wb.save('./basec.xlsx')
+
+endmonth()
