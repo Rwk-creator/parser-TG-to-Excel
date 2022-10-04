@@ -1,0 +1,93 @@
+from telethon import TelegramClient, events
+from openpyxl import load_workbook
+from datetime import datetime, date, time
+import re
+
+api_id = 19675460
+api_hash = '2fedc447ca07e5fddaa4b39f231fe073'
+
+client = TelegramClient('updater', api_id, api_hash)
+client.start()
+
+money = 0
+
+async def endmonth():
+    wb = load_workbook('./basec.xlsx')
+    sheet = wb['Sheet1']
+    andrey = sheet["D104"].value
+    datenow = datetime.now
+    d = 0
+    if d != -1:
+        text = ""
+        while d < len(datenow):
+            text += datenow[d]
+            d += 1
+        datelist = re.findall('[0-9]+', text)
+    print(datelist)
+    if f'{datelist[0]}-{datelist[1]}-01 00:00:00.000000' == datenow:
+        await client.send_message('dm1tri4', f'Привет, за прошлый месяц ты заработал: {andrey} гривен')
+    wb.save('./basec.xlsx')
+
+endmonth()
+
+@client.on(events.NewMessage(chats=('nvfodfpvsmzxbot')))
+async def normal_handler(event):
+    user_mess = event.message.to_dict()['message']
+    text = ""
+    p = int(user_mess.find("Дата выигрыша: "))
+    i = int(user_mess.find("Деньги("))
+    one = "1"
+    two = "1"
+    three = "1"
+    money = 0
+    if i != -1:
+        text = ""
+        
+        while i < len(user_mess):
+            text += user_mess[i]
+            i += 1
+        x = re.findall('[0-9]+', text)
+        money = int(x[0])
+
+    if p != -1:
+        text = ""
+        
+        while p < len(user_mess)-28:
+            text += user_mess[p]
+            p += 1
+        y = re.findall('[0-9]+', text)
+        one = y[0]
+        two = y[1]
+        three = y[2]
+        save(money, user_mess, one, two, three)
+    
+
+def save(money, text, one, two, three):
+    wb = load_workbook('./base.xlsx')
+    sheet = wb['Sheet1']
+    number = 2
+    nick = ""
+    rowname = ""
+    
+    for i in range(30):
+        nick += text[i]
+    
+    while number <= sheet.max_row:
+        indexname = f'B{number}'
+        indexvalue = f'D{number}'
+        indexdate = f'H{number}'
+        rowname = str(sheet[indexname].value)
+        number += 1
+        xy = re.findall(rowname, nick)
+        
+        if len(xy) == 1:
+            value = int(sheet[indexvalue].value)
+            sheet[indexvalue].value = value + money
+            sheet[indexdate].value = f'{one}.{two}.{three}'
+    
+    wb.save('./base.xlsx')
+
+
+
+
+client.run_until_disconnected()
